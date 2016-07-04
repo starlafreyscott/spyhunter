@@ -45,7 +45,7 @@ function scene:createScene(event)
 	platform.anchorY = 1
 	platform.x = 0
 	platform.y = display.viewableContentHeight - 110
-	physics.addBody(platform, "static", {density=.1, bounce=0.1, friction=.2})
+	physics.addBody(platform, "static", {density=.1, bounce=.9, friction=.2})
 	platform.speed = 4
 	screenGroup:insert(platform)
 
@@ -54,7 +54,7 @@ function scene:createScene(event)
 	platform2.anchorY = 1
 	platform2.x = platform2.width
 	platform2.y = display.viewableContentHeight - 110
-	physics.addBody(platform2, "static", {density=.1, bounce=0.1, friction=.2})
+	physics.addBody(platform2, "static", {density=.1, bounce=.9, friction=.2})
 	platform2.speed = 4
 	screenGroup:insert(platform2)
 	
@@ -64,7 +64,7 @@ function scene:createScene(event)
 	top_platform.anchorY = 1
 	top_platform.x = 0
 	top_platform.y = 162
-	physics.addBody(top_platform, "static", {density=.1, bounce=0.1, friction=.2})
+	physics.addBody(top_platform, "static", {density=1, bounce=.9, friction=1})
 	top_platform.speed = 4
 	screenGroup:insert(top_platform)
 
@@ -73,7 +73,7 @@ function scene:createScene(event)
 	top_platform2.anchorY = 1
 	top_platform2.x = top_platform2.width
 	top_platform2.y = 162 --display.viewableContentHeight - 1300
-	physics.addBody(top_platform2, "static", {density=.1, bounce=0.1, friction=.2})
+	physics.addBody(top_platform2, "static", {density=1, bounce=.9, friction=1})
 	top_platform2.speed = 4
 	screenGroup:insert(top_platform2)
 
@@ -116,10 +116,10 @@ end
 
 
 function onCollision( event )
-	if ( event.phase == "began" ) then
+	--[[if ( event.phase == "began" ) then
 		storyboard.gotoScene( "restart" )	
 	end
-end
+--]]end
 
 function platformScroller(self,event)
 	
@@ -135,12 +135,18 @@ local gameStarted = false
 
 
 
-function flyUp(event) -- Change before final ZZZ
+function upDown(event) -- Change before final ZZZ
 if (event.y > 700) then
-	dir = 1
+	dirY = 90
 else
-	dir = -1
+	dirY = -90
 end
+if (event.x > 300) then
+	dirX = 90
+else 
+	dirX = -90
+end
+
    if event.phase == "began" then
 		if gameStarted == false then
 			 player.bodyType = "dynamic"
@@ -152,7 +158,7 @@ end
 			 player:applyForce(0, 0, player.x, player.y)
 		else 
        
-	    player:applyForce(0, 90*dir, player.x, player.y)
+	    player:applyForce(dirX, dirY, player.x, player.y)
 
       end
 	end
@@ -212,7 +218,7 @@ end
 function scene:enterScene(event)
 	
 	storyboard.removeScene("start")
-	Runtime:addEventListener("touch", flyUp)
+	Runtime:addEventListener("touch", upDown)
 
 	platform.enterFrame = platformScroller
 	Runtime:addEventListener("enterFrame", platform)
@@ -225,7 +231,7 @@ function scene:enterScene(event)
 
 	top_platform2.enterFrame = groundScroller
 	Runtime:addEventListener("enterFrame", top_platform2)
-    
+
     Runtime:addEventListener("collision", onCollision)
    
    memTimer = timer.performWithDelay( 1000, checkMemory, 0 )
@@ -234,14 +240,14 @@ end
 
 function scene:exitScene(event)
 
-	Runtime:removeEventListener("touch", flyUp)
+	Runtime:removeEventListener("touch", upDown)
 	Runtime:removeEventListener("enterFrame", platform)
 	Runtime:removeEventListener("enterFrame", platform2)
 	Runtime:removeEventListener("collision", onCollision)
 	Runtime:removeEventListener("enterFrame", top_platform)
 	Runtime:removeEventListener("enterFrame", top_platform2)
-	--timer.cancel(addColumnTimer)
-	--timer.cancel(moveColumnTimer)
+--	timer.cancel(addColumnTimer)
+--	timer.cancel(moveColumnTimer)
 	timer.cancel(memTimer)
 	
 end
